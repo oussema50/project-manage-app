@@ -8,5 +8,5 @@ const router = express.Router()
 router.get('/',passport.authenticate('jwt', { session: false }), isRH,getAllUsers)
 router.get('/employee/:id',passport.authenticate('jwt', { session: false }),getUserById)
 router.put('/employee/update/:id',passport.authenticate('jwt', { session: false }),updateEmployeeById)
-router.delete('/employee/delete:id',passport.authenticate('jwt', { session: false }),isRH,deleteUser)
+router.delete('/employee/delete/:id',passport.authenticate('jwt', { session: false }),isRH,deleteUser)
 module.exports = router;

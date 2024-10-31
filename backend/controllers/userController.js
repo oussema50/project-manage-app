@@ -1,11 +1,13 @@
 const asyncHandler = require('express-async-handler');
-const User  = require('../models/user');  // Assuming User model is in models folder
+const User  = require('../models/user');  
 const { Op } = require('sequelize');
 const ApiError = require('../utils/ApiError');
+
 // @desc    Get all Users or filter
 // @route   GET /api/users
 // @access  Private (RH or Employee)
 exports.getAllUsers = asyncHandler(async (req, res) => {
+    console.log(req)
     const { firstName, email, role, page = 1, limit = 3 } = req.query;
     const pageNumber = parseInt(page, 10);
     const pageSize = parseInt(limit, 10);
@@ -75,7 +77,7 @@ exports.updateEmployeeById = asyncHandler(asyncHandler(async(req,res,next)=>{
 exports.deleteUser = asyncHandler(async (req, res) => {
     const {id} = req.params
     const user = await User.findByPk(id);
-  
+
     if (!user) {
       return next(new ApiError(`No user for this id ${id}`,404));
     } 

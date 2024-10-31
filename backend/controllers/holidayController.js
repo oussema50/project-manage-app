@@ -1,10 +1,36 @@
 const Holiday = require('../models/holiday');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('express-async-handler');
+const User = require('../models/user')
 const { Op } = require( 'sequelize');
+
+// @desc    Create Holiday Request
+// @route   POST /api/v1/holiday/holiday-request
+// @access  Private (RH or Employee)
 exports.createHolidayRequest = asyncHandler(async(req,res,next)=>{
     const {employeeId,startDate,endDate} = req.body
-
+    const existingRequest = await Holiday.findOne({
+        where: {
+            employeeId,
+            status: 'pending',
+        }
+    });
+    const overlappingRequest = await Holiday.findOne({
+        where: {
+            employeeId,
+            status: 'accepted',
+            startDate: {
+                [Op.lte]: new Date(endDate)
+            },
+            endDate: {
+                [Op.gte]: new Date(startDate)
+            }
+        }
+    });
+    if(overlappingRequest)next(new ApiError(`You already have an approved holiday for the specified period. Please select a different date range.`,400))
+    if (existingRequest) {
+        return next(new ApiError(`You already have a pending holiday request. Please wait until it is reviewed.`,400))
+    }
     const request = await Holiday.create({
         employeeId,
         startDate,
@@ -13,6 +39,9 @@ exports.createHolidayRequest = asyncHandler(async(req,res,next)=>{
     res.status(200).json({msg:'your holiday request is send. we will replay it asap'})
 })
 
+// @desc    Get all Holidays Request or filter
+// @route   GET /api/v1/holiday/all-holidays
+// @access  Private RH 
 exports.getAllRequestHoliday = asyncHandler(async(req,res,next)=>{
     const { status, dateStart, dateEnd, page = 1, limit = 5 } = req.query;
     const pageNumber = parseInt(page, 10);
@@ -36,3 +65,54 @@ exports.getAllRequestHoliday = asyncHandler(async(req,res,next)=>{
       });
 
 });
+
+// @desc    Update  Holiday Request By User Id
+// @route   PUT /api/v1/holiday/update-holiday/:id
+// @access  Private RH 
+exports.updateHolidayRequestStatus = asyncHandler(async(req,res,next)=>{
+    const { id } = req.params;
+    const { status, rejectionReason } = req.body;
+    holidayDays = 21;
+    console.log('hello user id from holiday',id)
+    const holidayRequest = await Holiday.findOne({
+        where: {
+            employeeId: id
+        },
+        order: [['createdAt', 'ASC']]
+        
+      })
+      console.log(holidayRequest)
+      if (!holidayRequest) return next(new ApiError(`Request not found`,404)) 
+
+      holidayRequest.status = status;
+      if (status === 'Rejected') {
+        return next(new ApiError(`${rejectionReason}`,404))
+        
+      }else{
+        const start = new Date(holidayRequest.startDate);
+        const end = new Date(holidayRequest.endDate);
+      
+        const differenceInMs = end - start;
+      
+        const Days = Math.round(differenceInMs / (1000 * 60 * 60 * 24));
+        if(Days > holidayDays){
+            holidayRequest.status = 'Rejected'
+        }
+      
+      }
+      
+      await holidayRequest.save();
+      res.status(200).json(holidayRequest);
+});
+
+// @desc    Get  Holiday Request By User ID
+// @route   GET /api/v1/holiday/user-haliday/:id
+// @access  Private (RH or employee)
+exports.getHolidayRequestsByEmployee = asyncHandler(async(req,res,next)=>{
+    const { id } = req.params;
+    const requests = await Holiday.findAll({
+        where: { id },
+        include: User,
+      });
+      res.json(requests);
+})

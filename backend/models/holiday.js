@@ -23,6 +23,16 @@ const Holiday= sequelize.define('Holiday', {
         type: DataTypes.ENUM('pending', 'accepted', 'rejected'),
         defaultValue: 'pending',
     },
+    rejectionReason: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    holidayDays:{
+        type:DataTypes.INTEGER,
+        allowNull:false,
+        defaultValue:21
+    }
+
 }, {
     timestamps: true, 
 });
