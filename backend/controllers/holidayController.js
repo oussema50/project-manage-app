@@ -9,6 +9,7 @@ const { Op } = require( 'sequelize');
 // @access  Private (RH or Employee)
 exports.createHolidayRequest = asyncHandler(async(req,res,next)=>{
     const {employeeId,startDate,endDate} = req.body
+    
     const existingRequest = await Holiday.findOne({
         where: {
             employeeId,
@@ -72,16 +73,13 @@ exports.getAllRequestHoliday = asyncHandler(async(req,res,next)=>{
 exports.updateHolidayRequestStatus = asyncHandler(async(req,res,next)=>{
     const { id } = req.params;
     const { status, rejectionReason } = req.body;
-    holidayDays = 21;
-    console.log('hello user id from holiday',id)
+    
     const holidayRequest = await Holiday.findOne({
         where: {
             employeeId: id
-        },
-        order: [['createdAt', 'ASC']]
-        
+        }    
       })
-      console.log(holidayRequest)
+
       if (!holidayRequest) return next(new ApiError(`Request not found`,404)) 
 
       holidayRequest.status = status;
@@ -91,12 +89,15 @@ exports.updateHolidayRequestStatus = asyncHandler(async(req,res,next)=>{
       }else{
         const start = new Date(holidayRequest.startDate);
         const end = new Date(holidayRequest.endDate);
-      
+        if( holidayRequest.holidayDays == 0){
+            return next(new ApiError(`You have no remaining holiday days.`,404))
+        }
         const differenceInMs = end - start;
       
         const Days = Math.round(differenceInMs / (1000 * 60 * 60 * 24));
-        if(Days > holidayDays){
+        if(Days > holidayRequest.holidayDays){
             holidayRequest.status = 'Rejected'
+            return next(new ApiError(`You requested ${Days} days, but you only have ${holidayRequest.holidayDays} holiday days remaining.`,404))
         }
       
       }
@@ -113,6 +114,24 @@ exports.getHolidayRequestsByEmployee = asyncHandler(async(req,res,next)=>{
     const requests = await Holiday.findAll({
         where: { id },
         include: User,
+        order: [['createdAt', 'ASC']]
       });
       res.json(requests);
 })
+
+// @desc    Delete  Holiday Request By User ID and send Notification
+// @route   DELETE  /api/v1/holiday/delete-haliday/:id
+// @access  Private (RH)
+
+exports.deleteHolidayRequestsByEmployee = asyncHandler(async(req,res,next)=>{
+    const {id} = req.params
+    const userHoliday = await Holiday.findByPk(id)
+    if (!userHoliday) {
+        return next(new ApiError(`No user for this id ${id}`,404));
+      } 
+     const deletedUserHoliday = await userHoliday.destroy();
+     console.log(deletedUserHoliday)
+     res.status(200).json({msg:"user holiday deleted successfully"});
+
+})
+
