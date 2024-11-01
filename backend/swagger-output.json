@@ -138,7 +138,7 @@
               "properties": {
                 "startDate": { "type": "string", "example": "2024-11-01" },
                 "endDate": { "type": "string", "example": "2024-11-05" },
-                "employeeId": { "type": "string"}
+                "employeeId": { "type": "string" }
               }
             }
           }
@@ -151,7 +151,7 @@
       }
     },
     "/api/v1/holiday/all-holidays": {
-      "post": {
+      "get": {
         "description": "Retrieve all holiday requests (Admin only)",
         "security": [
           { "jwtAuth": [] }
@@ -179,12 +179,11 @@
       }
     },
     "/api/v1/holiday/holiday-responce/{id}": {
-      "post": {
+      "put": {
         "description": "Update holiday request status",
         "security": [
           { "jwtAuth": [] }
         ],
-       
         "parameters": [
           { "name": "id", "in": "path", "required": true, "type": "string" },
           {
@@ -207,7 +206,7 @@
       }
     },
     "/api/v1/holiday/holiday-request/{id}": {
-      "post": {
+      "get": {
         "description": "Get holiday requests by employee ID",
         "security": [
           { "jwtAuth": [] }
@@ -236,6 +235,34 @@
               }
             }
           },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/v1/working-hour": {
+      "post": {
+        "description": "Create working hours for an employee",
+        "security": [
+          { "jwtAuth": [] }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "employeeId": { "type": "string", "example": "1" },
+                "startTime": { "type": "string", "example": "09:00" },
+                "endTime": { "type": "string", "example": "16:00" }
+              },
+              "required": ["employeeId", "date", "hours"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Working hours created successfully" },
+          "400": { "description": "Validation error" },
           "401": { "description": "Unauthorized" }
         }
       }
