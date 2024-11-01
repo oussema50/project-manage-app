@@ -239,9 +239,13 @@
         }
       }
     },
+
     "/api/v1/working-hour": {
       "post": {
         "description": "Create working hours for an employee",
+    "/api/v1/holiday/holiday-user/delete/{id}": {
+      "delete": {
+        "description": "",
         "security": [
           { "jwtAuth": [] }
         ],
@@ -264,6 +268,11 @@
           "200": { "description": "Working hours created successfully" },
           "400": { "description": "Validation error" },
           "401": { "description": "Unauthorized" }
+          { "name": "id", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "403": { "description": "Forbidden" }
         }
       }
     }
