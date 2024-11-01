@@ -31,6 +31,11 @@ const WorkingHours= sequelize.define('WorkingHour', {
         allowNull: false,
         defaultValue: DataTypes.NOW,
     },
+    hoursOfWork:{
+        type:DataTypes.INTEGER,
+        allowNull:false,
+        defaultValue:8
+    }
 
 }, {
     timestamps: true, 

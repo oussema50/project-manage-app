@@ -6,6 +6,7 @@ const app = express();
 const authRouter = require('./router/authRouter');
 const userRouter = require('./router/userRouter');
 const holidayRouter = require('./router/holidayRouter');
+const workingHourRoute = require('./router/workingHourRoute')
 const ApiError = require('./utils/ApiError');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger-output.json');
@@ -24,6 +25,7 @@ app.use(passport.initialize());
 app.use('/api/v1/auth',authRouter);
 app.use('/api/v1/users',userRouter);
 app.use('/api/v1/holiday',holidayRouter);
+app.use('/api/v1/working-hour',workingHourRoute);
 
 //Route Not Found
 app.use('*',(req,res,next)=>{
