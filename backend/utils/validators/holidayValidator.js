@@ -2,7 +2,6 @@ const {check,validationResult} = require('express-validator');
 const validatorMiddleware = require('../../middlewares/validatorMiddleware');
 
 exports.postHolidayValidator =[
-    check('employeeId').notEmpty().withMessage('employee id is required'),
     check('startDate').notEmpty().withMessage('start Date is required')
     .isISO8601().withMessage('Start date must be in YYYY-MM-DD format.'),
     check('endDate').notEmpty().withMessage('start Date is required')
