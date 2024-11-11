@@ -239,8 +239,40 @@
         }
       }
     },
+    "/api/v1/working-hour/all-working-hours": {
+      
+      "get": {
+        "tags":["working hours"],
+        "description": "Retrieve all working hours requests (RH only)",
+        "security": [
+          { "jwtAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of working hours requests",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string" },
+                  "employeeId": { "type": "string" },
+                  "startTime": { "type": "string" },
+                  "endTime": { "type": "string" },
+                  "status": { "type": "string" },
+                  "hoursOfWork": { "type": "integer" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" }
+        }
+      }
+    },
     "/api/v1/working-hour": {
       "post": {
+        "tags":["working hours"],
         "description": "Create working hours for an employee",
         "security": [
           { "jwtAuth": [] }
@@ -262,6 +294,34 @@
         ],
         "responses": {
           "200": { "description": "Working hours created successfully" },
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/v1/working-hour/update-status/{id}": {
+      "put": {
+        "tags":["working hours"],
+        "description": "update status of working hours for an employee",
+        "security": [
+          { "jwtAuth": [] }
+        ],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": { "type": "string", "example": "pending or validated or refused" }
+              },
+              "required": ["status"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Working hours updatetd successfully" },
           "400": { "description": "Validation error" },
           "401": { "description": "Unauthorized" }
         }
