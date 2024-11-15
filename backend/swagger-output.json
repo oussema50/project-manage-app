@@ -19,6 +19,7 @@
   "paths": {
     "/api/v1/auth/register": {
       "post": {
+        "tags":["authentication"],
         "description": "",
         "parameters": [
           {
@@ -45,6 +46,7 @@
     },
     "/api/v1/auth/login": {
       "post": {
+        "tags":["authentication"],
         "description": "",
         "parameters": [
           {
@@ -67,6 +69,7 @@
     },
     "/api/v1/users/": {
       "get": {
+        "tags":["User"],
         "description": "",
         "security": [
           { "jwtAuth": [] }
@@ -86,6 +89,7 @@
     },
     "/api/v1/users/employee/{id}": {
       "get": {
+        "tags":["User"],
         "description": "",
         "security": [
           { "jwtAuth": [] }
@@ -98,6 +102,31 @@
     },
     "/api/v1/users/employee/update/{id}": {
       "put": {
+        "tags":["User"],
+        "description": "",
+        "security": [
+          { "jwtAuth": [] }
+        ],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "firstName": { "type": "string", "example": "any" },
+                "lastName": { "type": "string", "example": "any" }
+              }
+            }
+          }
+        ],
+        "responses": { "default": { "description": "" } }
+      }
+    },
+    "/api/v1/users/employee/delete/{id}": {
+      "delete": {
+        "tags":["User"],
         "description": "",
         "security": [
           { "jwtAuth": [] }
@@ -105,56 +134,24 @@
         "parameters": [
           { "name": "id", "in": "path", "required": true, "type": "string" }
         ],
-        "responses": { "default": { "description": "" } }
-      }
-    },
-    "/api/v1/users/employee/{deleteid}": {
-      "delete": {
-        "description": "",
-        "security": [
-          { "jwtAuth": [] }
-        ],
-        "parameters": [
-          { "name": "deleteid", "in": "path", "required": true, "type": "string" }
-        ],
         "responses": {
           "200": { "description": "OK" },
           "403": { "description": "Forbidden" }
         }
       }
     },
-    "/api/v1/holiday/holiday-request": {
-      "post": {
-        "description": "Create a new holiday request",
-        "security": [
-          { "jwtAuth": [] }
-        ],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "startDate": { "type": "string", "example": "2024-11-01" },
-                "endDate": { "type": "string", "example": "2024-11-05" },
-                "employeeId": { "type": "string" }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": { "description": "Holiday request created successfully" },
-          "400": { "description": "Validation error" },
-          "401": { "description": "Unauthorized" }
-        }
-      }
-    },
     "/api/v1/holiday/all-holidays": {
       "get": {
+        "tags":["Holiday"],
         "description": "Retrieve all holiday requests (Admin only)",
         "security": [
           { "jwtAuth": [] }
+        ],"parameters": [
+          { "name": "status", "in": "query", "type": "string" },
+          { "name": "startDate", "in": "query", "type": "string" },
+          { "name": "endDate", "in": "query", "type": "string" },
+          { "name": "page", "in": "query", "type": "string" },
+          { "name": "limit", "in": "query", "type": "string" }
         ],
         "responses": {
           "200": {
@@ -180,10 +177,12 @@
     },
     "/api/v1/holiday/holiday-responce/{id}": {
       "put": {
+        "tags":["Holiday"],
         "description": "Update holiday request status",
         "security": [
           { "jwtAuth": [] }
         ],
+       
         "parameters": [
           { "name": "id", "in": "path", "required": true, "type": "string" },
           {
@@ -206,7 +205,8 @@
       }
     },
     "/api/v1/holiday/holiday-request/{id}": {
-      "get": {
+      "post": {
+        "tags":["Holiday"],
         "description": "Get holiday requests by employee ID",
         "security": [
           { "jwtAuth": [] }
@@ -217,6 +217,16 @@
             "in": "path",
             "required": true,
             "type": "string"
+          } ,{
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "startDate": { "type": "string", "example": "2024-12-02" },
+                "endDate": { "type": "string", "example": "2024-12-14" }
+              }
+            }
           }
         ],
         "responses": {
@@ -274,6 +284,10 @@
       "post": {
         "tags":["working hours"],
         "description": "Create working hours for an employee",
+    "/api/v1/holiday/holiday-user/delete/{id}": {
+      "delete": {
+        "tags":["Holiday"],
+        "description": "",
         "security": [
           { "jwtAuth": [] }
         ],
@@ -372,6 +386,27 @@
           "200": { "description": "Working hours updatetd successfully" },
           "400": { "description": "Validation error" },
           "401": { "description": "Unauthorized" }
+          { "name": "id", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "403": { "description": "Forbidden" }
+        }
+      }
+    },
+    "/api/v1/holiday/holiday-user/{id}": {
+      "get": {
+        "tags":["Holiday"],
+        "description": "",
+        "security": [
+          { "jwtAuth": [] }
+        ],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "403": { "description": "Forbidden" }
         }
       }
     },
