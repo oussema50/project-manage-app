@@ -123,13 +123,14 @@
         }
       }
     },
-    "/api/v1/holiday/holiday-request": {
+    "/api/v1/holiday/holiday-request/{id}": {
       "post": {
         "description": "Create a new holiday request",
         "security": [
           { "jwtAuth": [] }
         ],
         "parameters": [
+          {"name":"id","in":"path","required":true,"type":"string"},
           {
             "name": "body",
             "in": "body",
@@ -137,8 +138,7 @@
               "type": "object",
               "properties": {
                 "startDate": { "type": "string", "example": "2024-11-01" },
-                "endDate": { "type": "string", "example": "2024-11-05" },
-                "employeeId": { "type": "string"}
+                "endDate": { "type": "string", "example": "2024-11-05" }
               }
             }
           }
@@ -202,40 +202,6 @@
         "responses": {
           "200": { "description": "Holiday request updated successfully" },
           "400": { "description": "Validation error" },
-          "401": { "description": "Unauthorized" }
-        }
-      }
-    },
-    "/api/v1/holiday/holiday-request/{id}": {
-      "post": {
-        "description": "Get holiday requests by employee ID",
-        "security": [
-          { "jwtAuth": [] }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of holiday requests by employee",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "id": { "type": "string" },
-                  "startDate": { "type": "string" },
-                  "endDate": { "type": "string" },
-                  "status": { "type": "string" }
-                }
-              }
-            }
-          },
           "401": { "description": "Unauthorized" }
         }
       }
