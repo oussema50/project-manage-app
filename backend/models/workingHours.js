@@ -1,6 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const User = require ('./user'); 
 const sequelize = require('../db/index');
+const { check } = require('express-validator');
 
 const WorkingHours= sequelize.define('WorkingHour', {
     employeeId: {
@@ -22,7 +23,7 @@ const WorkingHours= sequelize.define('WorkingHour', {
         defaultValue: '16:00:00',
     },
     status: {
-        type: DataTypes.ENUM('pending', 'validated', 'refused'),
+        type: DataTypes.ENUM('pending', 'accepted', 'rejected'),
         defaultValue: 'pending',
         allowNull: false,
     },
@@ -32,9 +33,28 @@ const WorkingHours= sequelize.define('WorkingHour', {
         defaultValue: DataTypes.NOW,
     },
     hoursOfWork:{
-        type:DataTypes.INTEGER,
+        type:DataTypes.STRING,
         allowNull:false,
-        defaultValue:8
+        defaultValue:'8 hours'
+    },
+    reason:{
+        type:DataTypes.TEXT,
+        allowNull: true
+    },
+    checkOutStatus:{
+        type:DataTypes.ENUM('pending', 'accepted', 'rejected'),
+        allowNull: true
+    },
+    checkoutTime:{
+        type: DataTypes.TIME
+    },
+    hoursOfCheckOut:{
+        type:DataTypes.BIGINT,
+        defaultValue:0,
+    },
+    checkOutReason:{
+        type:DataTypes.TEXT,
+        allowNull:true
     }
 
 }, {
