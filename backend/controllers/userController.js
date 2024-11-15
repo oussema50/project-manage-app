@@ -8,13 +8,15 @@ const ApiError = require('../utils/ApiError');
 // @access  Private (RH or Employee)
 exports.getAllUsers = asyncHandler(async (req, res) => {
     console.log(req)
-    const { firstName, email, role, page = 1, limit = 3 } = req.query;
+    const { firstName, lastName, age, email, role, page = 1, limit = 3 } = req.query;
     const pageNumber = parseInt(page, 10);
     const pageSize = parseInt(limit, 10);
     const searchCriteria = {
-        ...(firstName && { firstName: { [Op.like]: `%${firstName}%` } }),  // partial match for name
-        ...(email && { email: { [Op.like]: `%${email}%` } }),  // partial match for email
-        ...(role && { role: { [Op.eq]: role } }),  // exact match for role
+        ...(firstName && { firstName: { [Op.like]: `%${firstName}%` } }),  
+        ...(lastName && { lastName: { [Op.like]: `%${lastName}%` } }),  
+        ...(email && { email: { [Op.like]: `%${email}%` } }),  
+        ...(role && { role: { [Op.eq]: role } }),  
+        ...(age && { age: { [Op.eq]: age } }),  
       };
     const { count, rows } = await User.findAndCountAll({
     where: searchCriteria,
@@ -46,14 +48,14 @@ exports.getUserById = asyncHandler(async (req, res,next) => {
 // @desc    Update user by ID
 // @route   GET /api/users/update/:id
 // @access  Private (RH or Employee)
-exports.updateEmployeeById = asyncHandler(asyncHandler(async(req,res,next)=>{
+exports.updateEmployeeById = asyncHandler(async(req,res,next)=>{
     const {firstName,lastName,email,age} = req.body
     const {id}= req.params
     const user = await User.findByPk(id);
     if(!user){
         return next(new ApiError(`No user for this id ${id}`,404))
     }
-    if(user.id !== id  ){
+    if(req.user.id !== user.id  ){
       return next(new ApiError(`you are not autorized to change the data of other user`,404))
     }
     const updatedUser = await user.update({
@@ -69,12 +71,12 @@ exports.updateEmployeeById = asyncHandler(asyncHandler(async(req,res,next)=>{
       email:updatedUser.email,
       age:updatedUser.age
     }});
-}));
+});
 
 // @desc    Delete user
 // @route   DELETE /api/users/delete/:id
 // @access  Protected (RH)
-exports.deleteUser = asyncHandler(async (req, res) => {
+exports.deleteUser = asyncHandler(async (req, res,next) => {
     const {id} = req.params
     const user = await User.findByPk(id);
 

@@ -168,6 +168,7 @@
         }
       }
     },
+
     "/api/v1/holiday/all-holidays": {
       "get": {
         "tags":["Holiday"],
@@ -257,6 +258,100 @@
           { "jwtAuth": [] }
         ],
         "parameters": [
+          { "name": "employeeId", "in": "path", "required": true, "type": "string" }          
+        ],
+        "responses": {
+          "200": { "description": "Working hours created successfully" },
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/v1/working-hour/checkOut-request/{employeeId}": {
+      "put": {
+        "tags":["working hours"],
+        "description": "check out from work",
+        "security": [
+          { "jwtAuth": [] }
+        ],
+        "parameters": [
+          { "name": "employeeId", "in": "path", "required": true, "type": "string" },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": { "type": "string", "example": "go to doctor"},
+                "checkoutTime":{ "type": "string", "example": "14:00"},
+                "hoursOfCheckOut":{ "type": "string", "example": "2 hours 30 minutes"}
+              },
+              "required": ["employeeId", "reason","checkoutTime","hours"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "check out from work successfully" },
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/v1/working-hour/update-status": {
+      "put": {
+        "tags":["working hours"],
+        "description": "update status of working hours for an employee",
+        "security": [
+          { "jwtAuth": [] }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": { "type": "string", "example": "pending or accepted or rejected" },
+                "reason": { "type": "string", "example": "write the reason of reject" },
+                "id": { "type": "string", "example": "employee id" }
+              },
+              "required": ["status"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Working hours updatetd successfully" },
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/v1/working-hour/update-check-out-request": {
+      "put": {
+        "tags":["working hours"],
+        "description": "update status of working hours for an employee",
+        "security": [
+          { "jwtAuth": [] }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                
+                "employeeId": { "type": "string", "example": "1" },
+                "checkOutStatus": { "type": "string", "example": "pending or accepted or rejected" }
+              },
+              "required": ["employeeId","checkOutStatus"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Working hours updatetd successfully" },
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" }
           { "name": "id", "in": "path", "required": true, "type": "string" }
         ],
         "responses": {
@@ -300,6 +395,10 @@
       "post": {
         "tags":["working hours"],
         "description": "Create working hours for an employee",
+    "/api/v1/holiday/holiday-user/{id}": {
+      "get": {
+        "tags":["Holiday"],
+        "description": "",
         "security": [
           { "jwtAuth": [] }
         ],
@@ -401,6 +500,7 @@
         }
       }
     },
+
     "/api/v1/working-hour/": {
       "get": {
         "tags":["working hours"],
