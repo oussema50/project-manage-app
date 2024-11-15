@@ -249,7 +249,22 @@
         }
       }
     },
-
+    "/api/v1/holiday/holiday-user/{id}": {
+      "get": {
+        "tags":["Holiday"],
+        "description": "",
+        "security": [
+          { "jwtAuth": [] }
+        ],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "403": { "description": "Forbidden" }
+      }
+    }
+  },
     "/api/v1/holiday/holiday-user/delete/{id}": {
       "delete": {
         "tags":["Holiday"],
@@ -313,22 +328,7 @@
         }
       }
     },
-    "/api/v1/holiday/holiday-user/{id}": {
-      "get": {
-        "tags":["Holiday"],
-        "description": "",
-        "security": [
-          { "jwtAuth": [] }
-        ],
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "type": "string" }
-        ],
-        "responses": {
-          "200": { "description": "OK" },
-          "403": { "description": "Forbidden" }
-      }
-    }
-  },
+   
     "/api/v1/working-hour/checkOut-request/{employeeId}": {
       "put": {
         "tags":["working hours"],
