@@ -74,11 +74,10 @@ exports.getAllRequestHoliday = asyncHandler(async(req,res,next)=>{
 // @route   PUT /api/v1/holiday/update-holiday/:id
 // @access  Private RH 
 exports.updateHolidayRequestStatus = asyncHandler(async(req,res,next)=>{
-    const { id } = req.params;
-    const { status, reason } = req.body;
+    const { status, reason,employeeId } = req.body;
     const holidayRequest = await Holiday.findOne({
         where: {
-            employeeId: id
+            employeeId
         },
         order: [['createdAt', 'DESC']]  
     });
