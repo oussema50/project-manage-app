@@ -142,6 +142,7 @@
     },
     "/api/v1/holiday/holiday-request/{id}": {
       "post": {
+        "tags":["Holiday"],
         "description": "Create a new holiday request",
         "security": [
           { "jwtAuth": [] }
