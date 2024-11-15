@@ -125,6 +125,7 @@
     },
     "/api/v1/holiday/holiday-request/{id}": {
       "post": {
+
         "description": "Create a new holiday request",
         "security": [
           { "jwtAuth": [] }
@@ -178,7 +179,7 @@
         }
       }
     },
-    "/api/v1/holiday/holiday-responce/{id}": {
+    "/api/v1/holiday/holiday-responce": {
       "put": {
         "description": "Update holiday request status",
         "security": [
@@ -186,7 +187,6 @@
         ],
        
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "type": "string" },
           {
             "name": "body",
             "in": "body",
@@ -194,7 +194,8 @@
               "type": "object",
               "properties": {
                 "status": { "type": "string", "example": "accepted" },
-                "reason": { "type": "string", "example": "Reason for rejection" }
+                "reason": { "type": "string", "example": "Reason for rejection" },
+                "employeeId":{ "type": "string", "example": "2" }
               }
             }
           }
