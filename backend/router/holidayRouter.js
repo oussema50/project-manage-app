@@ -14,7 +14,7 @@ passportScr(passport)
 
 router.post('/holiday-request/:id',passport.authenticate('jwt', { session: false }),postHolidayValidator,createHolidayRequest)
 router.get('/all-holidays',passport.authenticate('jwt', { session: false }),isRH,getAllRequestHoliday)
-router.put('/holiday-responce/:id',passport.authenticate('jwt', { session: false }),isRH,updateHolidayRequestStatus)
+router.put('/holiday-responce',passport.authenticate('jwt', { session: false }),isRH,updateHolidayRequestStatus)
 router.get('/holiday-user/:id',passport.authenticate('jwt', { session: false }),getHolidayRequestsByEmployee)
 router.delete('/holiday-user/delete/:id',passport.authenticate('jwt', { session: false }),isRH,deleteHolidayRequestsByEmployee)
 module.exports = router;
