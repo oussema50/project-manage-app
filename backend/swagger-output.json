@@ -140,6 +140,33 @@
         }
       }
     },
+    "/api/v1/holiday/holiday-request/{id}": {
+      "post": {
+        "description": "Create a new holiday request",
+        "security": [
+          { "jwtAuth": [] }
+        ],
+        "parameters": [
+          {"name":"id","in":"path","required":true,"type":"string"},
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "startDate": { "type": "string", "example": "2024-11-01" },
+                "endDate": { "type": "string", "example": "2024-11-05" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Holiday request created successfully" },
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
     "/api/v1/holiday/all-holidays": {
       "get": {
         "tags":["Holiday"],
@@ -204,51 +231,6 @@
         }
       }
     },
-    "/api/v1/holiday/holiday-request/{id}": {
-      "post": {
-        "tags":["Holiday"],
-        "description": "Get holiday requests by employee ID",
-        "security": [
-          { "jwtAuth": [] }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          } ,{
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "startDate": { "type": "string", "example": "2024-12-02" },
-                "endDate": { "type": "string", "example": "2024-12-14" }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of holiday requests by employee",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "id": { "type": "string" },
-                  "startDate": { "type": "string" },
-                  "endDate": { "type": "string" },
-                  "status": { "type": "string" }
-                }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" }
-        }
-      }
-    },
     "/api/v1/holiday/holiday-user/{id}": {
       "get": {
         "tags":["Holiday"],
@@ -265,6 +247,7 @@
       }
     }
   },
+
     "/api/v1/holiday/holiday-user/delete/{id}": {
       "delete": {
         "tags":["Holiday"],

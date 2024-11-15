@@ -12,7 +12,7 @@ const { createHolidayRequest,
 const {passportScr }=require('../utils/passport');
 passportScr(passport)
 
-router.post('/holiday-request',passport.authenticate('jwt', { session: false }),postHolidayValidator,createHolidayRequest)
+router.post('/holiday-request/:id',passport.authenticate('jwt', { session: false }),postHolidayValidator,createHolidayRequest)
 router.get('/all-holidays',passport.authenticate('jwt', { session: false }),isRH,getAllRequestHoliday)
 router.put('/holiday-responce/:id',passport.authenticate('jwt', { session: false }),isRH,updateHolidayRequestStatus)
 router.get('/holiday-user/:id',passport.authenticate('jwt', { session: false }),getHolidayRequestsByEmployee)
