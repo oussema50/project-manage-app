@@ -81,7 +81,9 @@ exports.checkOut = asyncHandler(async(req,res,next)=>{
    if(workingHour.checkOutStatus === "pending"){
         return next(new ApiError('you have already send a request for check-out ',400))
    }
-   
+   if(workingHour.checkOutStatus === "accepted"){
+     return next(new ApiError('your request is accepted',400))
+   }
     const checkouthour= timeStringToMilliseconds(hoursOfCheckOut)
     const hoursOfWork = timeStringToMilliseconds(workingHour.hoursOfWork)
 
@@ -151,7 +153,6 @@ exports.getAllWorkingHours = asyncHandler(async(req,res,next)=>{
     const { status, date,hoursOfWork,checkOutStatus,checkoutTime, page = 1, limit = 3 } = req.query;
     const pageNumber = parseInt(page, 10);
     const pageSize = parseInt(limit, 10);
-    console.log('status:============><>>>', status)
     const searchCriteria = {
         ...(status && { status: { [Op.like]: `%${status}%` } }),
         ...(date && { date: { [Op.eq]: `%${date}%` } }), 
