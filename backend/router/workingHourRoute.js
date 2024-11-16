@@ -16,7 +16,7 @@ const router = express.Router()
 router.post('/checkIn/:employeeId',passport.authenticate('jwt', { session: false }),createWorkingHour)
 router.put('/checkOut-request/:employeeId',passport.authenticate('jwt', { session: false }),checkOut)
 router.get('/all-working-hours',passport.authenticate('jwt', { session: false }),isRH,getAllWorkingHours)
-router.get('/all-working-hours/:id',passport.authenticate('jwt', { session: false }),getWorkingHoursById)
+router.get('/all-working-hours/:employeeId',passport.authenticate('jwt', { session: false }),getWorkingHoursById)
 router.put('/update-status',passport.authenticate('jwt', { session: false }),isRH,updateStatusWorkingHour)
 router.put('/update-check-out-request',passport.authenticate('jwt', { session: false }),isRH,updateCheckOutOfWork)
 

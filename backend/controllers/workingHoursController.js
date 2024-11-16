@@ -21,7 +21,6 @@ exports.createWorkingHour = asyncHandler(async(req,res,next)=>{
 
     const [checkOutHour, checkOutMinute] = checkOutTime.split(":").map(Number);
 
-    // Create Date objects for check-in and check-out
     const checkIn = new Date(today);
 
     const chekcInHours = checkIn.getHours() + 1;
@@ -62,7 +61,7 @@ exports.createWorkingHour = asyncHandler(async(req,res,next)=>{
             endTime:end,
             hoursOfWork:workingHours
         });
-    res.status(201).json({data:workingHour})
+    res.status(201).json({data:workingHour,msg:"your check in request is send"})
 });
 
 exports.checkOut = asyncHandler(async(req,res,next)=>{
@@ -73,6 +72,7 @@ exports.checkOut = asyncHandler(async(req,res,next)=>{
     if (!workingHour) {
         return next(new ApiError('You are not check-in Today',400))
     }
+    console.log(workingHour)
     if(workingHour.status === 'pending' ){
         return next(new ApiError('your workingHour is still pending',400))
     }else if(workingHour.status ==='rejected'){
@@ -84,8 +84,7 @@ exports.checkOut = asyncHandler(async(req,res,next)=>{
    
     const checkouthour= timeStringToMilliseconds(hoursOfCheckOut)
     const hoursOfWork = timeStringToMilliseconds(workingHour.hoursOfWork)
-    console.log("checkouthour====>", checkouthour)
-    console.log("hoursOfWork====>", hoursOfWork)
+
     if(checkouthour > hoursOfWork){
         return next(new ApiError('Your checkout hours are greater than the hours of work.',400))
     }
@@ -135,9 +134,7 @@ exports.updateCheckOutOfWork = asyncHandler(async(req,res,next)=>{
     const checkOutHours = workingHours.hoursOfCheckOut 
     const hoursOfWork = timeStringToMilliseconds(workingHours.hoursOfWork)
     const newHoursOfWork = hoursOfWork - checkOutHours
-    console.log('checkOutHours=========>',checkOutHours)
-    console.log('hoursOfWork=========>',hoursOfWork)
-    console.log('newHoursOfWork=========>',newHoursOfWork)
+  
     const hours = Math.floor(newHoursOfWork / (60 * 60 * 1000)); 
     const minutes = Math.floor((newHoursOfWork % (60 * 60 * 1000)) / (60 * 1000));
     console.log(`${hours} hours ${minutes} minutes`)
@@ -151,18 +148,19 @@ exports.updateCheckOutOfWork = asyncHandler(async(req,res,next)=>{
 // @route   get /api/v1/working-hour/all-working-hours
 // @access   Private RH
 exports.getAllWorkingHours = asyncHandler(async(req,res,next)=>{
-    const { status, date,hoursOfWork, page = 1, limit = 3 } = req.query;
+    const { status, date,hoursOfWork,checkOutStatus,checkoutTime, page = 1, limit = 3 } = req.query;
     const pageNumber = parseInt(page, 10);
     const pageSize = parseInt(limit, 10);
+    console.log('status:============><>>>', status)
     const searchCriteria = {
-        ...(status && { status: { [Op.eq]: `%${status}%` } }),
+        ...(status && { status: { [Op.like]: `%${status}%` } }),
         ...(date && { date: { [Op.eq]: `%${date}%` } }), 
-        ...(hoursOfWork && { hoursOfWork: { [Op.eq]: hoursOfWork } }),  
-        ...(checkOutStatus && { checkOutStatus: { [Op.eq]: checkOutStatus } }),  
-        ...(checkoutTime && { checkoutTime: { [Op.eq]: checkoutTime } }),  
+        ...(hoursOfWork && { hoursOfWork: { [Op.like]: `%${hoursOfWork}%`  } }),  
+        ...(checkOutStatus && { checkOutStatus: { [Op.eq]: `%${checkOutStatus}%`  } }),  
+        ...(checkoutTime && { checkoutTime: { [Op.eq]: `%${checkoutTime}%`  } }),  
       };
     const { count, rows } = await WorkingHours.findAndCountAll({
-    where: searchCriteria,
+    where: {...searchCriteria},
     limit: pageSize,          // Number of records to return
     offset: (pageNumber - 1) * pageSize, // Calculate offset
     });
@@ -179,17 +177,19 @@ exports.getAllWorkingHours = asyncHandler(async(req,res,next)=>{
 // @route   get /api/v1/working-hour/id
 // @access   Private RH or Employee
 exports.getWorkingHoursById = asyncHandler(async(req,res,next)=>{
-    const {id} = req.params
+    const {employeeId} = req.params
+    
     const { status, date,hoursOfWork, page = 1, limit = 3 } = req.query;
     const pageNumber = parseInt(page, 10);
     const pageSize = parseInt(limit, 10);
     const searchCriteria = {
-        ...(status && { status: { [Op.eq]: `%${status}%` } }),
+        ...(status && { status: { [Op.like]: `%${status}%` } }),
         ...(date && { date: { [Op.eq]: `%${date}%` } }), 
-        ...(hoursOfWork && { hoursOfWork: { [Op.eq]: hoursOfWork } }),  
+        ...(hoursOfWork && { hoursOfWork: { [Op.like]: `%${hoursOfWork}%`  } }),  
+ 
       };
     const { count, rows } = await WorkingHours.findAndCountAll({
-    where: {employeeId:id,...searchCriteria},
+    where: {employeeId,...searchCriteria},
     limit: pageSize,          // Number of records to return
     offset: (pageNumber - 1) * pageSize, // Calculate offset
     });
