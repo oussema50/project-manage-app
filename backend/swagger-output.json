@@ -247,6 +247,15 @@
         "security": [
           { "jwtAuth": [] }
         ],
+        "parameters": [
+          { "name": "status", "in": "query", "type": "string" },
+          { "name": "date", "in": "query", "type": "string" },
+          { "name": "hoursOfWork", "in": "query", "type": "string" },
+          { "name": "checkOutStatus", "in": "query", "type": "string" },
+          { "name": "checkoutTime", "in": "query", "type": "string" },
+          { "name": "page", "in": "query", "type": "string" },
+          { "name": "limit", "in": "query", "type": "string" }
+        ],
         "responses": {
           "200": {
             "description": "List of working hours requests",
@@ -375,7 +384,7 @@
         }
       }
     },
-    "/api/v1/working-hour/": {
+    "/api/v1/working-hour/all-working-hours/{employeeId}": {
       "get": {
         "tags":["working hours"],
         "description": "",
@@ -383,14 +392,31 @@
           { "jwtAuth": [] }
         ],
         "parameters": [
-          { "name": "firstName", "in": "query", "type": "string" },
-          { "name": "email", "in": "query", "type": "string" },
-          { "name": "role", "in": "query", "type": "string" },
-          { "name": "page", "in": "query", "type": "string" },
-          { "name": "limit", "in": "query", "type": "string" }
+          { "name": "employeeId", "in": "path", "type": "string" },
+          { "name": "status", "in": "query", "type": "string" },
+          { "name": "date", "in": "query", "type": "string" },
+          { "name": "hoursOfWork", "in": "query", "type": "string" }
+         
         ],
-        "responses": {
-          "200": { "description": "OK" },
+       "responses": {
+          "200": {
+            "description": "List of working hours requests",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string" },
+                  "employeeId": { "type": "string" },
+                  "startTime": { "type": "string" },
+                  "endTime": { "type": "string" },
+                  "status": { "type": "string" },
+                  "hoursOfWork": { "type": "string" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden" }
         }
       }
