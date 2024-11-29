@@ -1,0 +1,36 @@
+/* .header {
+    background-color: #333;
+    padding: 1rem;
+  }
+  
+  .nav {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .nav-list {
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .nav-list li {
+    margin: 0 1rem;
+  }
+  
+  .nav-link {
+    text-decoration: none;
+    color: white;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+  }
+  
+  .nav-link:hover {
+    color: #00bcd4;
+  }
+  
+  .nav-link:active {
+    color: #ff5722;
+  }
+   */

@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 import {setLocalStorage,removeLocalStorage} from '../../utils/localStorage'
 const initialState = {
-    user:null
+    user:null,
+    token:null
 }
 
 export const userSlice = createSlice({
@@ -9,8 +10,8 @@ export const userSlice = createSlice({
     initialState,
     reducers: {
       login: (state,action) => {
-        setLocalStorage('user',JSON.stringify(action.payload))
-        state.user = action.payload
+        state.user = action.payload.user
+        state.token = action.payload.token
       },
       logout: (state) => {
         removeLocalStorage('user')

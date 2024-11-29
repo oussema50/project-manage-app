@@ -11,7 +11,7 @@ exports.registerUser = asyncHandler(async(req,res,next)=>{
     const {firstName,lastName,email,age,password,role} = req.body
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({firstName,lastName,email,age,password:hashedPassword,role});
-    res.status(200).json({data:user});
+    res.status(200).json({msg:'User registered successfully'});
 })
 
 // @desc     login A User
@@ -35,7 +35,7 @@ exports.loginUser = asyncHandler(async (req, res) => {
         expiresIn: '1h',
       });
   
-      res.json({ token,data:{firstName:user.firstName,lastName:user.lastName,email:user.email,age:user.age,} });
+      res.json({ token,user:{id:user.id,firstName:user.firstName,lastName:user.lastName,email:user.email,age:user.age,} });
     
 })
 

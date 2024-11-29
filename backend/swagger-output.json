@@ -306,7 +306,7 @@
         }
       }
     },
-    "/api/v1/working-hour/checkIn/{employeeId}": {
+    "/api/v1/working-hour/checkIn/{id}": {
       "post": {
         "tags":["working hours"],
         "description": "Create working hours for an employee",

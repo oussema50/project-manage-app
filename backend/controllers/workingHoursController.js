@@ -10,8 +10,10 @@ const { Op } = require( 'sequelize');
 // @access   Private (RH or Employee)
 exports.createWorkingHour = asyncHandler(async(req,res,next)=>{
 
-    const { employeeId} = req.params;
-    if(req.user.id != employeeId)next(new ApiError('you are not autorized',401))
+    const { id } = req.params; 
+     
+    console.log('req.user.id=======>>',req.user.id, id)
+    // if(req.user.id != id)next(new ApiError('you are not autorized',401))
 
     const date = new Date().toISOString().split('T')[0]
 
@@ -43,8 +45,8 @@ exports.createWorkingHour = asyncHandler(async(req,res,next)=>{
 
     const existingWorkingHour = await WorkingHours.findOne({
         where: {
-            employeeId,
-            status:'pending'
+            employeeId:id,
+            date
         },
         order: [['createdAt', 'DESC']]
     });
@@ -55,7 +57,7 @@ exports.createWorkingHour = asyncHandler(async(req,res,next)=>{
         }
     }
     const workingHour = await WorkingHours.create({ 
-            employeeId,
+            employeeId:id,
             date,
             startTime : start,
             endTime:end,
@@ -65,10 +67,14 @@ exports.createWorkingHour = asyncHandler(async(req,res,next)=>{
 });
 
 exports.checkOut = asyncHandler(async(req,res,next)=>{
-    const {reason,checkoutTime,hoursOfCheckOut } = req.body
-    const {employeeId} = req.params
+    const {checkoutTime,hoursOfCheckOut,reason } = req.body
+    const {id} = req.params
+    console.log("employee id is :==================>>>>>>>",id)
     const today = new Date();
-    const workingHour = await WorkingHours.findOne({where:{employeeId},order: [['createdAt', 'DESC']]});
+    const formattedToday = today.toISOString().split('T')[0];
+    const workingHour = await WorkingHours.findOne({where:{employeeId:id,date:formattedToday}});
+    console.log("workingHour are :==================>>>>>>>",workingHour)
+
     if (!workingHour) {
         return next(new ApiError('You are not check-in Today',400))
     }
@@ -104,12 +110,14 @@ exports.checkOut = asyncHandler(async(req,res,next)=>{
 // @access   Private RH 
 exports.updateStatusWorkingHour = asyncHandler(async(req,res,next)=>{
     const {id,status,reason} = req.body
+    console.log('hello from updateStatusWorkingHour')
     const workingHours = await WorkingHours.findOne({where:{employeeId:id},order: [['createdAt', 'DESC']]})
     if(!workingHours){
         return next(new ApiError('your check-in not found',400));
     }
     workingHours.status = status;
     await workingHours.save();
+    console.log('workingHours:::::====>>>>>',workingHours)
     if (workingHours.status === 'accepted') {
         res.status(200).json({
             msg: ` your check-in has been reviewed and accepted. Have a great day at work!`
@@ -119,12 +127,14 @@ exports.updateStatusWorkingHour = asyncHandler(async(req,res,next)=>{
             msg: ` unfortunately, your check-in has been rejected. Please contact HR for further assistance.`,
             reson:reason
         });
-    }    
+    }
+    
 })
 
 exports.updateCheckOutOfWork = asyncHandler(async(req,res,next)=>{
     const {employeeId,checkOutStatus} = req.body;
     const workingHours = await WorkingHours.findOne({where:{employeeId},order: [['createdAt', 'DESC']]})
+    console.log('workingHours from updateCheckOutOfWork===============>>>>>>',employeeId,checkOutStatus)
     if(!workingHours)next(new ApiError('You are not check-in Today',400))
    
     if(workingHours.checkOutStatus === null ){
@@ -142,7 +152,7 @@ exports.updateCheckOutOfWork = asyncHandler(async(req,res,next)=>{
     console.log(`${hours} hours ${minutes} minutes`)
     workingHours.hoursOfWork = `${hours} hours ${minutes} minutes`
     workingHours.checkOutStatus = checkOutStatus
-    workingHours.save();
+    // workingHours.save();
     return res.status(200).json({msg:'your check out request is accepted'});
 })
 
@@ -150,7 +160,7 @@ exports.updateCheckOutOfWork = asyncHandler(async(req,res,next)=>{
 // @route   get /api/v1/working-hour/all-working-hours
 // @access   Private RH
 exports.getAllWorkingHours = asyncHandler(async(req,res,next)=>{
-    const { status, date,hoursOfWork,checkOutStatus,checkoutTime, page = 1, limit = 3 } = req.query;
+    const { status, date,hoursOfWork,checkOutStatus,checkoutTime, page = 1, limit = 5 } = req.query;
     const pageNumber = parseInt(page, 10);
     const pageSize = parseInt(limit, 10);
     const searchCriteria = {
@@ -160,14 +170,22 @@ exports.getAllWorkingHours = asyncHandler(async(req,res,next)=>{
         ...(checkOutStatus && { checkOutStatus: { [Op.eq]: `%${checkOutStatus}%`  } }),  
         ...(checkoutTime && { checkoutTime: { [Op.eq]: `%${checkoutTime}%`  } }),  
       };
-    const { count, rows } = await WorkingHours.findAndCountAll({
-    where: {...searchCriteria},
-    limit: pageSize,          // Number of records to return
-    offset: (pageNumber - 1) * pageSize, // Calculate offset
-    });
+      const { count, rows } = await WorkingHours.findAndCountAll({
+        where: { ...searchCriteria },
+        limit: pageSize,          // Number of records to return
+        offset: (pageNumber - 1) * pageSize, // Calculate offset
+        include: [
+          {
+            model: User, 
+            attributes: ['firstName', 'lastName','email']
+          },
+        ],
+        order: [['createdAt', 'DESC']]
+      });
+      
     const totalPages = Math.ceil(count / pageSize);
     res.json({
-        totalUsers: count,
+        totalWorkingHours: count,
         totalPages,
         currentPage: pageNumber,
         workingHours: rows,
@@ -180,7 +198,7 @@ exports.getAllWorkingHours = asyncHandler(async(req,res,next)=>{
 exports.getWorkingHoursById = asyncHandler(async(req,res,next)=>{
     const {employeeId} = req.params
     
-    const { status, date,hoursOfWork, page = 1, limit = 3 } = req.query;
+    const { status, date,hoursOfWork, page = 1, limit = 4 } = req.query;
     const pageNumber = parseInt(page, 10);
     const pageSize = parseInt(limit, 10);
     const searchCriteria = {
@@ -192,11 +210,18 @@ exports.getWorkingHoursById = asyncHandler(async(req,res,next)=>{
     const { count, rows } = await WorkingHours.findAndCountAll({
     where: {employeeId,...searchCriteria},
     limit: pageSize,          // Number of records to return
-    offset: (pageNumber - 1) * pageSize, // Calculate offset
+    offset: (pageNumber - 1) * pageSize, 
+    include: [
+        {
+          model: User, 
+          attributes: ['firstName', 'lastName','email']
+        },
+      ],
+      order: [['createdAt', 'DESC']]
     });
     const totalPages = Math.ceil(count / pageSize);
     res.json({
-        totalUsers: count,
+        totalWorkingHours: count,
         totalPages,
         currentPage: pageNumber,
         workingHours: rows,

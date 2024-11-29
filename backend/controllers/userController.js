@@ -7,7 +7,7 @@ const ApiError = require('../utils/ApiError');
 // @route   GET /api/users
 // @access  Private (RH or Employee)
 exports.getAllUsers = asyncHandler(async (req, res) => {
-    console.log(req)
+    
     const { firstName, lastName, age, email, role, page = 1, limit = 3 } = req.query;
     const pageNumber = parseInt(page, 10);
     const pageSize = parseInt(limit, 10);

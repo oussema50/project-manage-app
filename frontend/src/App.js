@@ -2,41 +2,36 @@ import './App.css';
 import { Route, Routes, BrowserRouter } from "react-router-dom";
 import { Home } from './pages/Home';
 import About from './pages/About'
-import PrivateRoute from './utils/PrivateRoute';
-import Login  from './components/auth/Login';
-import { Register } from './components/auth/Register';
+import {ProtectedRhRoute,ProtectedRoute,ProtectAuthRoute, isLogin, isAdmin} from './utils/PrivateRoute';
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
+import { DashBord } from './pages/DashBord';
+import { Header } from './components/header/Header';
+import { NotFound } from './components/NotFound';
+import { useEffect, useState } from 'react';
+import { DashbordEmployee } from './pages/DashbordEmployee';
+import io from 'socket.io-client';
+import { WorkingHourPage } from './pages/WorkingHourPage';
+
 function App() {
+
   return (
-    <div className="App">
+    <div className="App ">
+      
       <BrowserRouter>
-              
-                  <Routes>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/" element={<Home />} />
-                    <Route path="/about" element={<PrivateRoute><About /></PrivateRoute>} />
-                      {/* <Route path="/" element={<Index />} />
-                      <Route path="/:slug/" element={<Detail />} />
-                      <Route path="/category/:slug/" element={<Category />} />
-                      <Route path="/search/" element={<Search />} />
+      <Header />
+        <Routes>
+          <Route path="/login" element={<ProtectAuthRoute><Login /></ProtectAuthRoute>} />
+          <Route path="/register" element={<ProtectAuthRoute><Register /></ProtectAuthRoute>} />
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
+          <Route path="/employee-dashbord/:id" element={<ProtectedRoute><DashbordEmployee /></ProtectedRoute>} />
+          <Route path="/rh-dashbord" element={<ProtectedRhRoute><DashBord /></ProtectedRhRoute>} />
+          <Route path="/working-hours" element={<ProtectedRhRoute><WorkingHourPage /></ProtectedRhRoute>} />
 
-                     <Route path="/register/" element={<Register />} />
-                      <Route path="/login/" element={<Login />} />
-                      <Route path="/logout/" element={<Logout />} />
-                      <Route path="/forgot-password/" element={<ForgotPassword />} />
-                      <Route path="/create-password/" element={<CreatePassword />} />
-
-                      <Route path="/dashboard/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-                      <Route path="/posts/" element={<PrivateRoute><Posts /></PrivateRoute>} />
-                      <Route path="/add-post/" element={<AddPost />} />
-                      <Route path="/edit-post/:id/" element={<EditPost />} />
-                      <Route path="/comments/" element={<Comments />} />
-                      <Route path="/notifications/" element={<Notifications />} />
-                      <Route path="/profile/" element={<Profile />} />
-
-                      <Route path="/about/" element={<About />} />
-                      <Route path="/contact/" element={<Contact />} /> */}
-                  </Routes>
+          {/* <Route path="/employee-dashbord" element={<ProtectedRoute><DashbordEmployee /></ProtectedRoute>} /> */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
              
       </BrowserRouter>
     </div>

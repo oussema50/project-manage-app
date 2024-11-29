@@ -3,7 +3,7 @@ const ApiError = require('../utils/ApiError');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/user')
 const { Op } = require( 'sequelize');
-
+const { io, clients } = require("../index");
 // @desc    Create Holiday Request
 // @route   POST /api/v1/holiday/holiday-request
 // @access  Private (RH or Employee)
@@ -30,15 +30,32 @@ exports.createHolidayRequest = asyncHandler(async(req,res,next)=>{
             }
         }
     });
+    const lastHoliday = await Holiday.findOne({
+        where:{
+            employeeId:id,
+            status:'accepted'
+        },
+        order: [['createdAt', 'DESC']]
+    })
     if(overlappingRequest)next(new ApiError(`You already have an approved holiday for the specified period. Please select a different date range.`,400))
     if (existingRequest) {
         return next(new ApiError(`You already have a pending holiday request. Please wait until it is reviewed.`,400))
     }
-    const request = await Holiday.create({
-        employeeId:id,
-        startDate,
-        endDate,
-    });
+    if(lastHoliday){
+        await Holiday.create({
+            employeeId:id,
+            startDate,
+            endDate,
+            holidayDays:lastHoliday.holidayDays
+        });
+    }else{
+        await Holiday.create({
+            employeeId:id,
+            startDate,
+            endDate,
+        });
+    }
+    
     res.status(200).json({msg:'your holiday request is send. we will replay it asap'})
 })
 
@@ -49,23 +66,48 @@ exports.getAllRequestHoliday = asyncHandler(async(req,res,next)=>{
     const { status, startDate, endDate, page = 1, limit = 5 } = req.query;
     const pageNumber = parseInt(page, 10);
     const pageSize = parseInt(limit, 10);
+    const today = new Date();
+    const formattedToday = today.toISOString().split('T')[0];
+
+    // Fetch holidays that include today in their date range
+    const holidaysCount = await Holiday.findAll({
+        where: {
+            status: 'accepted', // Only check accepted holidays
+            startDate: { [Op.lte]: formattedToday }, // Start date <= today
+            endDate: { [Op.gt]: formattedToday },   // End date >= today
+        },
+    });
+    const acceptedHolidaysCount = holidaysCount.length
 
     const searchCriteria = {
         ...(status && { status: { [Op.like]: `%${status}%` } }),  
         ...(startDate && { startDate: { [Op.eq]: new Date(startDate) } }),  
         ...(endDate && { endDate: { [Op.eq]: new Date(endDate) } }),  
     }
-    const { count, rows } = await Holiday.findAndCountAll({
+   
+    
+    
+    console.log('Accepted Holidays Count:', holidaysCount);
+        const { count, rows } = await Holiday.findAndCountAll({
         where: searchCriteria,
         limit: pageSize,          // Number of records to return
         offset: (pageNumber - 1) * pageSize, // Calculate offset
+        include: [
+            {
+              model: User, 
+              attributes: ['firstName', 'lastName','email']
+            },
+          ],
+          order: [['createdAt', 'DESC']]
     });
+    // console.log('rows=========///////////////=====',rows)
     const totalPages = Math.ceil(count / pageSize);
     res.status(200).json({
         totalholidayRequest: count,
         totalPages,
         currentPage: pageNumber,
         holidayRequest: rows,
+        acceptedHolidaysCount
       });
 
 });
@@ -75,6 +117,7 @@ exports.getAllRequestHoliday = asyncHandler(async(req,res,next)=>{
 // @access  Private RH 
 exports.updateHolidayRequestStatus = asyncHandler(async(req,res,next)=>{
     const { status, reason,employeeId } = req.body;
+  
     const holidayRequest = await Holiday.findOne({
         where: {
             employeeId
@@ -82,9 +125,18 @@ exports.updateHolidayRequestStatus = asyncHandler(async(req,res,next)=>{
         order: [['createdAt', 'DESC']]  
     });
     if (!holidayRequest) return next(new ApiError(`Request not found`,404)) ;
-    if(holidayRequest.status == "accepted")return next(new ApiError(`holiday is accepted.`,404));
-    if(holidayRequest.status =="rejected")return next(new ApiError(`holiday is rejected.`,404));
+    if(holidayRequest.status == "accepted"){
+            // io.emit("notification", { message:'holiday is already accepted' });
+          
+        return next(new ApiError(`holiday is already accepted.`,404))
+    };
+    if(holidayRequest.status =="rejected"){
+            // io.emit("notification", { message:'holiday is already rejected' });
+        return next(new ApiError(`holiday is already rejected`,404));
+    }
     if( holidayRequest.holidayDays == 0){
+            // io.emit("notification", { message:'You have no remaining holiday days' });
+        
         return next(new ApiError(`You have no remaining holiday days.`,404));
     }
     const start = new Date(holidayRequest.startDate);
@@ -97,7 +149,8 @@ exports.updateHolidayRequestStatus = asyncHandler(async(req,res,next)=>{
     if (status === 'rejected') {
 
     holidayRequest.rejectionReason = reason;
-    return next(new ApiError(`${reason}`,404));
+    await holidayRequest.save();
+    return res.status(200).json({msg:reason});
     
     }else{
     
@@ -106,6 +159,7 @@ exports.updateHolidayRequestStatus = asyncHandler(async(req,res,next)=>{
         holidayRequest.rejectionReason = `You requested ${days} days, but you only have ${holidayRequest.holidayDays} holiday days remaining.`;
         // return next(new ApiError(`You requested ${days} days, but you only have ${holidayRequest.holidayDays} holiday days remaining.`,404))
     }else{
+        // io.emit("notification", { message:'your holiday is accepted' });
 
         holidayRequest.holidayDays = holidayRequest.holidayDays - days;
     }
