@@ -138,21 +138,26 @@ exports.updateCheckOutOfWork = asyncHandler(async(req,res,next)=>{
     if(!workingHours)next(new ApiError('You are not check-in Today',400))
    
     if(workingHours.checkOutStatus === null ){
+
         return next(new ApiError('you have to sent a request of check out',400))
     }
     if(checkOutStatus === "rejected" ){
+        workingHours.checkOutStatus = checkOutStatus
+        workingHours.save();
         return next(new ApiError('your check out request is rejected',400))
+    }else{
+        const checkOutHours = workingHours.hoursOfCheckOut 
+        const hoursOfWork = timeStringToMilliseconds(workingHours.hoursOfWork)
+        const newHoursOfWork = hoursOfWork - checkOutHours
+      
+        const hours = Math.floor(newHoursOfWork / (60 * 60 * 1000)); 
+        const minutes = Math.floor((newHoursOfWork % (60 * 60 * 1000)) / (60 * 1000));
+        console.log(`${hours} hours ${minutes} minutes`)
+        workingHours.hoursOfWork = `${hours} hours ${minutes} minutes`
+        workingHours.checkOutStatus = checkOutStatus
+        workingHours.save();
     }
-    const checkOutHours = workingHours.hoursOfCheckOut 
-    const hoursOfWork = timeStringToMilliseconds(workingHours.hoursOfWork)
-    const newHoursOfWork = hoursOfWork - checkOutHours
-  
-    const hours = Math.floor(newHoursOfWork / (60 * 60 * 1000)); 
-    const minutes = Math.floor((newHoursOfWork % (60 * 60 * 1000)) / (60 * 1000));
-    console.log(`${hours} hours ${minutes} minutes`)
-    workingHours.hoursOfWork = `${hours} hours ${minutes} minutes`
-    workingHours.checkOutStatus = checkOutStatus
-    // workingHours.save();
+    
     return res.status(200).json({msg:'your check out request is accepted'});
 })
 

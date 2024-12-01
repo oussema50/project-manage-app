@@ -14,21 +14,26 @@ services:
       - DB_NAME=manageDB
     depends_on:
       - mysqlDB
-    command: npm run dev  # Assuming you're using nodemon for development
-
+    command: npm run dev 
+  
   mysqlDB:
     image: mysql:8
     restart: always
     ports:
       - "3306:3306"
     volumes:
-      - ./backend/mysql_data:/var/lib/mysql  # Ensure the correct path for MySQL data persistence
+      - ./backend/mysql_data:/var/lib/mysql  
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: manageDB
       MYSQL_USER: user
       MYSQL_PASSWORD: userpassword
-
+  test:
+    build: ./backend
+    command: npx mocha test/login.test.mjs
+    depends_on:
+      - backend
+      
   frontend:
     build: ./frontend
     volumes:

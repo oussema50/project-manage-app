@@ -12,8 +12,7 @@ import { getAllWorkingHour, udpateCheckOutStatus } from "../../redux/slices/work
 const UpdateCheckOutPopUp = ({id}) => {
     const initialValues = {
         employeeId: id,
-        status: "",
-        reason: "",
+        checkOutStatus: "",
       };
     const dispatch = useDispatch()
     const updateCheckOutPopUp = useSelector(state=>state.popUp.updateCheckOutPopUp)
@@ -21,22 +20,16 @@ const UpdateCheckOutPopUp = ({id}) => {
     // const notifications = useSelector(state=>state.notification.notifications)
     const validationSchema = Yup.object().shape({
         employeeId: Yup.string().required("Employee ID is required"),
-        status: Yup.string().required("Status is required"),
-        reason: Yup.string()
-          .test("reason-required", "Reason is required for rejection", function (value) {
-            const { status } = this.parent; // Access sibling fields
-            if (status === "rejected") {
-              return !!value; // Return true if value exists
-            }
-            return true; // Always pass if status is not "rejected"
-          }),
+        checkOutStatus: Yup.string().required("Status is required"),
+        
       });
       
 
-
+ 
 
   const handleSubmit = async(values, { resetForm }) => {
     try{
+        console.log('values from update checkout pop up ===== ',values)
         await dispatch(udpateCheckOutStatus([values,token]))
         // dispatch(getAllWorkingHour([{},token]))
           
@@ -54,7 +47,7 @@ const UpdateCheckOutPopUp = ({id}) => {
         console.log(error.response.data.message)
     }
     resetForm();
-    dispatch(hiddenUpdateCheckOutPopUp(false))
+    dispatch(hiddenUpdateCheckOutPopUp())
   };
   return (
    <div>
@@ -62,7 +55,7 @@ const UpdateCheckOutPopUp = ({id}) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded shadow-md w-96">
             <h2 className="text-xl font-bold mb-4">check-out Update</h2>
-                <Formik
+            <Formik
                     initialValues={initialValues}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
@@ -91,27 +84,27 @@ const UpdateCheckOutPopUp = ({id}) => {
 
                         {/* Status Dropdown */}
                         <div className="mb-4">
-                        <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="checkOutStatus" className="block text-sm font-medium text-gray-700">
                             Status
                         </label>
                         <Field
                             as="select"
-                            id="status"
-                            name="status"
+                            id="checkOutStatus"
+                            name="checkOutStatus"
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         >
-                            <option value="" label="Select status" />
+                            <option value="" label="Select" />
                             <option value="accepted" label="accepted" />
                             <option value="rejected" label="rejected" />
                         </Field>
                         <ErrorMessage
-                            name="status"
+                            name="checkOutStatus"
                             component="div"
                             className="text-red-500 text-sm mt-1"
                         />
                         </div>
 
-                        {values.status === "rejected" && (
+                        {/* {values.status === "rejected" && (
                         <div className="mb-4">
                             <label htmlFor="reason" className="block text-sm font-medium text-gray-700">
                             Reason for Rejection
@@ -129,12 +122,12 @@ const UpdateCheckOutPopUp = ({id}) => {
                             className="text-red-500 text-sm mt-1"
                             />
                         </div>
-                        )}
+                        )} */}
                         <div className="flex justify-end gap-4">
                             
                             <button
                                 type="button"
-                                onClick={() => dispatch(hiddenUpdateCheckOutPopUp(false))}
+                                onClick={() => dispatch(hiddenUpdateCheckOutPopUp())}
                                 className="px-4 py-2 bg-gray-300 rounded"
                             >
                                 Cancel
@@ -152,7 +145,7 @@ const UpdateCheckOutPopUp = ({id}) => {
           </div>
         </div>
       )}
-      <Notification employeeId = {id}/>
+      {/* <Notification employeeId = {id}/> */}
    </div>
   );
 };

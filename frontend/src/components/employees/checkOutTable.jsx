@@ -92,26 +92,28 @@ export const CheckOutTable = () => {
               <tbody>
               {workingHours.workingHours &&
                 workingHours.workingHours.map((workingHour, index) => {
-                    const result = convertMilliseconds(workingHour.hoursOfCheckOut)
-                    if(workingHour.checkOutStatus){
-                        return (
-                            <tr
-                    key={index}
-                    className={`${
-                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                    } hover:bg-gray-100 transition-colors duration-200 cursor-pointer`}
-                  >
+                  const result = convertMilliseconds(workingHour.hoursOfCheckOut)
+                  if(workingHour.checkOutStatus){
+                    return (
+                      <tr
+                      key={index}
+                      className={`border-b border-white ${
+                        workingHour.checkOutStatus=== 'accepted'
+                          ? 'bg-green-200 hover:bg-green-400'
+                          : workingHour.checkOutStatus=== 'rejected'
+                          ? 'bg-red-200 hover:bg-red-400'
+                          : workingHour.checkOutStatus=== 'pending'
+                          ? 'bg-yellow-200 hover:bg-yellow-300'
+                          : index % 2 === 0
+                          ? 'bg-white'
+                          : 'bg-gray-50'
+                      }  transition-colors duration-200 cursor-pointer`}
+                      >
                     <td className="py-4 px-6 text-sm text-gray-800">{workingHour.id}</td>
                     <td className="py-4 px-6 text-sm text-gray-800">{workingHour.employeeId}</td>
                     <td className="py-4 px-6 text-sm text-gray-800">{workingHour.date}</td>
                     <td
-                      className={`py-4 px-6 text-sm text-gray-800 ${
-                        workingHour.checkOutStatus === 'accepted'
-                          ? 'bg-green-500 text-white'
-                          : workingHour.checkOutStatus === 'rejected'
-                          ? 'bg-red-500 text-white'
-                          : 'bg-yellow-300 text-black'
-                      }`}
+                      className={`py-4 px-6 text-sm text-gray-800`}
                     >
                       {workingHour.checkOutStatus}
                     </td>

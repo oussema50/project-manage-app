@@ -105,10 +105,18 @@ export const HolidayTable = () => {
               {holidays.holidayRequest &&
                 holidays.holidayRequest.map((holiday, index) => (
                   <tr
-                    key={index}
-                    className={`${
-                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                    } hover:bg-gray-100 transition-colors duration-200 cursor-pointer`}
+                  key={index}
+                  className={`border-b border-white ${
+                    holiday.status === 'accepted'
+                      ? 'bg-green-200 hover:bg-green-400'
+                      : holiday.status === 'rejected'
+                      ? 'bg-red-200 hover:bg-red-400'
+                      : holiday.status === 'pending'
+                      ? 'bg-yellow-200 hover:bg-yellow-300'
+                      : index % 2 === 0
+                      ? 'bg-white'
+                      : 'bg-gray-50'
+                  }  transition-colors duration-200 cursor-pointer`}
                   >
                     <td className="py-4 px-6 text-sm text-gray-800">{holiday.id}</td>
                     <td className="py-4 px-6 text-sm text-gray-800">{holiday.employeeId}</td>
@@ -118,13 +126,7 @@ export const HolidayTable = () => {
                     <td className="py-4 px-6 text-sm text-gray-800">{converToStringDate(holiday.startDate)}</td>
                     <td className="py-4 px-6 text-sm text-gray-800">{converToStringDate(holiday.endDate)}</td>
                     <td
-                      className={`py-4 px-6 text-sm text-gray-800 ${
-                        holiday.status === 'accepted'
-                          ? 'bg-green-500 text-white'
-                          : holiday.status === 'rejected'
-                          ? 'bg-red-500 text-white'
-                          : 'bg-yellow-300 text-black'
-                      }`}
+                      className={`py-4 px-6 text-sm text-gray-800 `}
                     >
                       {holiday.status}
                     </td>

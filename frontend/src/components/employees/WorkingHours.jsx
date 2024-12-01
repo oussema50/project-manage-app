@@ -99,46 +99,51 @@ export const WorkingHours = () => {
                 </tr>
               </thead>
               <tbody>
-              {workingHours.workingHours &&
-                workingHours.workingHours.map((workingHour, index) => (
-                  <tr
-                    key={index}
-                    className={`border-b border-gray-300 ${
-                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                    } hover:bg-gray-100 transition-colors duration-200 cursor-pointer`}
-                    // onClick={() => handleRowClick(workingHour.id)}
-                  >
-                    <td className="py-4 px-6 text-sm text-gray-800">{workingHour.id}</td>
-                    <td className="py-4 px-6 text-sm text-gray-800">{workingHour.employeeId}</td>
-                    <td className="py-4 px-6 text-sm text-gray-800">{workingHour.User.firstName}</td>
-                    <td className="py-4 px-6 text-sm text-gray-800">{workingHour.User.lastName}</td>
-                    <td className="py-4 px-6 text-sm text-gray-800">{workingHour.User.email}</td>
-                    <td className="py-4 px-6 text-sm text-gray-800">{workingHour.date}</td>
-                    <td className="py-4 px-6 text-sm text-gray-800">{workingHour.startTime}</td>
-                    <td className="py-4 px-6 text-sm text-gray-800">{workingHour.endTime}</td>
-                    <td
-                      className={`py-4 px-6 text-sm text-gray-800 ${
+                {workingHours.workingHours &&
+                  workingHours.workingHours.map((workingHour, index) => (
+                    <tr
+                      key={index}
+                      className={`border-b border-white ${
                         workingHour.status === 'accepted'
-                          ? 'bg-green-500 text-white'
+                          ? 'bg-green-200 hover:bg-green-400'
                           : workingHour.status === 'rejected'
-                          ? 'bg-red-500 text-white'
-                          : 'bg-yellow-300 text-black'
-                      }`}
+                          ? 'bg-red-200 hover:bg-red-400'
+                          : workingHour.status === 'pending'
+                          ? 'bg-yellow-200 hover:bg-yellow-300'
+                          : index % 2 === 0
+                          ? 'bg-white'
+                          : 'bg-gray-50'
+                      }  transition-colors duration-200 cursor-pointer`}
+                      // onClick={() => handleRowClick(workingHour.id)}
                     >
-                      {workingHour.status}
-                    </td>
-                    <td className="py-4 px-6 text-sm text-gray-800">{workingHour.hoursOfWork}</td>
-                    <td className="py-4 px-6 text-sm text-gray-800">
-                      <button onClick={()=>updateWorkingHour(workingHour.employeeId)} className="px-4 py-2 mb-4 mr-4 w-20 bg-blue-500 text-white text-sm font-medium rounded-md shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 transition duration-200">
-                        update
-                      </button>
-                      <button onClick={()=>deleteWorkingHour(workingHour.id)}  className="px-4 py-2 w-20  bg-red-500 text-white text-sm font-medium rounded-md shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1 transition duration-200">
-                        delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                      <td className="py-4 px-6 text-sm text-gray-800">{workingHour.id}</td>
+                      <td className="py-4 px-6 text-sm text-gray-800">{workingHour.employeeId}</td>
+                      <td className="py-4 px-6 text-sm text-gray-800">{workingHour.User.firstName}</td>
+                      <td className="py-4 px-6 text-sm text-gray-800">{workingHour.User.lastName}</td>
+                      <td className="py-4 px-6 text-sm text-gray-800">{workingHour.User.email}</td>
+                      <td className="py-4 px-6 text-sm text-gray-800">{workingHour.date}</td>
+                      <td className="py-4 px-6 text-sm text-gray-800">{workingHour.startTime}</td>
+                      <td className="py-4 px-6 text-sm text-gray-800">{workingHour.endTime}</td>
+                      <td className="py-4 px-6 text-sm text-gray-800">{workingHour.status}</td>
+                      <td className="py-4 px-6 text-sm text-gray-800">{workingHour.hoursOfWork}</td>
+                      <td className="py-4 px-6 text-sm text-gray-800">
+                        <button
+                          onClick={() => updateWorkingHour(workingHour.employeeId)}
+                          className="px-4 py-2 mb-4 mr-4 w-20 bg-blue-500 text-white text-sm font-medium rounded-md shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 transition duration-200"
+                        >
+                          update
+                        </button>
+                        <button
+                          onClick={() => deleteWorkingHour(workingHour.id)}
+                          className="px-4 py-2 w-20 bg-red-500 text-white text-sm font-medium rounded-md shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1 transition duration-200"
+                        >
+                          delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
+
             </table>
             </>
           )}
